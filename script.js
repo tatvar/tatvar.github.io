@@ -12,6 +12,7 @@ const defense = document.getElementById("defense");
 const specialAttack = document.getElementById("special-attack");
 const specialDefense = document.getElementById("special-defense");
 const speed = document.getElementById("speed");
+let tncopy;
 
 const output = document.getElementById("top-container");
 const copyright = document.getElementById("copyright")
@@ -52,11 +53,15 @@ const getPokemon = async () => {
         vatpayerRegisteredDate
       }
     } = data2;
-console.log(name);
 
     pokemonName.textContent = "Нэр: " + name.toUpperCase();
   //  pokemonID.textContent = "ТИН нууцлалын дугаар: " + tin;
-    pokemonWeight.textContent = "ТИН нууцлалын дугаар: #" + tin;
+    pokemonWeight.innerHTML = "ТИН дугаар: #" + tin + `
+    <button onclick="copyToClipboard()"
+        id="copybutton" class="px-4 text-sm py-1 text-white bg-sky-500 rounded-full hover:bg-sky-600 focus:outline-none focus:ring-2 focus:ring-blue-300">
+        ХУУЛАХ
+    </button>`;
+    tncopy=tin;
     hp.textContent = `${vatPayer ? "Тийм" : "Үгүй"}`;
     attack.textContent = `${cityPayer ? "Тийм" : "Үгүй"}`;
     defense.textContent =`${found ? "Тийм" : "Үгүй"}`;
@@ -97,6 +102,21 @@ button.addEventListener("click", (event) => {
   clearUI();
   getPokemon();
 });
+
+function copyToClipboard() {
+  const text = tncopy;
+  navigator.clipboard.writeText(text)
+      .then(() => {
+        const copybtn = document.getElementById("copybutton");
+          copybtn.classList.add("bg-green-500");
+          copybtn.classList.add("hover:bg-green-500");
+          copybtn.disabled = true;
+          copybtn.textContent = "Амжилттай";
+      })
+      .catch(err => {
+          alert('Хуулж чадсангүй. ', err);
+      });
+}
 
 /*input.addEventListener("input", (event) => {
     clearUI();
