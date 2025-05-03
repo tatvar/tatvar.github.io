@@ -58,7 +58,7 @@ const getPokemon = async () => {
   //  pokemonID.textContent = "ТИН нууцлалын дугаар: " + tin;
     pokemonWeight.innerHTML = "ТИН дугаар: #" + tin + `
     <button onclick="copyToClipboard()"
-        id="copybutton" class="px-4 text-sm py-1 text-white bg-sky-500 rounded-full hover:bg-sky-600 focus:outline-none focus:ring-2 focus:ring-blue-300">
+        id="copybutton" class="px-4 text-sm py-1 text-white bg-violet-400 rounded-full hover:bg-violet-500 focus:outline-none focus:ring-2 focus:ring-blue-300">
         ХУУЛАХ
     </button>`;
     tncopy=tin;
@@ -108,8 +108,8 @@ function copyToClipboard() {
   navigator.clipboard.writeText(text)
       .then(() => {
         const copybtn = document.getElementById("copybutton");
-          copybtn.classList.add("bg-green-500");
-          copybtn.classList.add("hover:bg-green-500");
+          copybtn.classList.add("bg-lime-600");
+          copybtn.classList.add("hover:bg-lime-600");
           copybtn.disabled = true;
           copybtn.textContent = "Амжилттай";
       })

@@ -8,25 +8,31 @@
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.23/dist/full.min.css" rel="stylesheet" type="text/css" />
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      body {
+        color: white;
+      }
+    </style>
   </head>
-  <body class="bg-gradient-to-b from-sky-500 min-h-screen flex items-center flex-col justify-center">
-    <main class="container max-w-md bg-white shadow-lg rounded-lg p-8 font-mono text-base transition-all ease-in-out delay-150">
-      <h1 class="text-2xl font-bold text-center mb-4">Татвар төлөгчийн мэдээлэл шалгах програм</h1> 
+  <!-- <body class="bg-gradient-to-b from-teal-500 min-h-screen flex items-center flex-col justify-center"> -->
+  <body style="background-image: url(wallpaper.jpg); background-size: cover;" class="min-h-screen flex items-center flex-col justify-center">
+    <main class="container max-w-md bg-white/30 backdrop-blur-md shadow-lg rounded-lg p-8 font-mono text-base transition-all ease-in-out delay-150">
+      <h1 class="text-2xl font-bold text-center mb-4 text-white">Татвар төлөгчийн мэдээлэл шалгагч апп</h1> 
      <!-- <p id="author" class="my-2 text-center text-sm">By: Цэнгүүнбилэг</p>  -->
       <div class="w-full">
         <form role="search" id="search-form" class="mb-3">
-          <label for="search-input">Регистрийн дугаар оруулна уу:</label>
+          <label for="search-input" class="text-white">Регистрийн дугаар оруулна уу:</label>
           <input 
             type="text" 
             name="pokemon" 
             id="search-input" 
             required
             placeholder="Регистрийн дугаар" 
-            class="w-3/4 border-2 rounded p-2 focus:outline-none focus:ring-2 focus:ring-sky-500" 
+            class="w-3/4 border-2 text-pink-200 bg-transparent rounded p-2 placeholder-violet-200 focus:outline-none focus:ring-2 focus:ring-violet-400" 
           />
           <button 
             id="search-button" 
-            class="px-4 py-2 bg-sky-500 text-white rounded-md hover:bg-sky-600"
+            class="px-4 py-2 bg-pink-400 text-white rounded-md hover:bg-pink-600 transition-all ease-in"
           >
             Хайх
           </button>
@@ -45,26 +51,26 @@
             <div id="types"></div>
           </div>
           <div class="bottom-container mt-4">
-            <table class="w-full border-2 border-separate border-sky-300 border-spacing-2">
+            <table class="w-full border-2 border-separate border-pink-300 border-spacing-2">
               <tr>
-                <th class="border border-slate-300 bg-sky-300">Мэдээ</th>
-                <th class="border border-slate-300 p-1 bg-sky-300">Хариу</th>
+                <th class="border border-slate-300 bg-pink-400">Мэдээ</th>
+                <th class="border border-slate-300 p-1 bg-pink-400">Хариу</th>
               </tr>
               <tr>
-                <td class="border border-slate-300 p-1 bg-sky-200/70">НӨАТ төлөгч эсэх</td>
-                <td id="hp" class="border border-slate-300 p-1 bg-sky-200/70"></td>
+                <td class="border border-slate-300 p-1 ">НӨАТ төлөгч эсэх</td>
+                <td id="hp" class="border border-slate-300 p-1 "></td>
               </tr>
               <tr>
-                <td class="border border-slate-300 p-1 bg-sky-100">НХАТ төлөгч эсэх</td>
-                <td id="attack" class="border border-slate-300 p-1 bg-sky-100"></td>
+                <td class="border border-slate-300 p-1 ">НХАТ төлөгч эсэх</td>
+                <td id="attack" class="border border-slate-300 p-1 "></td>
               </tr>
               <tr>
-                <td class="border border-slate-300 p-1 bg-sky-100">Олдсон эсэх</td>
-                <td id="defense" class="border border-slate-300 p-1 bg-sky-100"></td>
+                <td class="border border-slate-300 p-1 ">Олдсон эсэх</td>
+                <td id="defense" class="border border-slate-300 p-1 "></td>
               </tr>
               <tr>
-                <td class="border border-slate-300 p-1 bg-sky-100">НӨАТ төлөгч болсон огноо</td>
-                <td id="special-attack" class="border border-slate-300 p-1 bg-sky-100"></td>
+                <td class="border border-slate-300 p-1 ">НӨАТ төлөгч болсон огноо</td>
+                <td id="special-attack" class="border border-slate-300 p-1"></td>
               </tr>
             </table>
           </div>
@@ -72,7 +78,7 @@
       </div>
       <div id="copyright">
         <p class="text-sm text-center mt-6">
-      Зөвхөн Датакейр компанийн <span class="font-semibold">Call Center</span>-нхэдээ зориулав ❤️. By: Tsenguun.
+      Зөвхөн Датакейр компанийн <span class="font-semibold">Call Center</span>-нхэдээ зориулав ❤️
     </p>
       </div>
       <script src="./script.js"></script>
