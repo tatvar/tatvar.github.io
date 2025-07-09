@@ -17,7 +17,7 @@ let tncopy;
 const output = document.getElementById("top-container");
 const copyright = document.getElementById("copyright")
 
-const apiURL = "https://api.ebarimt.mn/api/info/check/getTinInfo?regNo=";
+const apiURL = "https://api.ebarimt.com/api/info/check/getTinInfo?regNo=";
 
 const getPokemon = async () => {
   try {
