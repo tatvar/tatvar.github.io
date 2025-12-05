@@ -17,7 +17,7 @@ let tncopy;
 const output = document.getElementById("top-container");
 const copyright = document.getElementById("copyright")
 
-const apiURL = "https://api.ebarimt.com/api/info/check/getTinInfo?regNo=";
+const apiURL = "https://api.ebarimt.mn/api/info/check/getTinInfo?regNo=";
 
 const getPokemon = async () => {
   try {
@@ -101,6 +101,31 @@ button.addEventListener("click", (event) => {
   event.preventDefault();
   clearUI();
   getPokemon();
+  showClearButton();
+});
+
+function showClearButton() {
+  const clearButton = document.getElementById("clear-button");
+  if (input.value.trim() !== "") {
+    clearButton.classList.remove("hidden");
+  }
+}
+
+function clearInput() {
+  input.value = "";
+  const clearButton = document.getElementById("clear-button");
+  clearButton.classList.add("hidden");
+  clearUI();
+}
+
+// Show/hide clear button based on input content
+input.addEventListener("input", () => {
+  const clearButton = document.getElementById("clear-button");
+  if (input.value.trim() !== "") {
+    clearButton.classList.remove("hidden");
+  } else {
+    clearButton.classList.add("hidden");
+  }
 });
 
 function copyToClipboard() {

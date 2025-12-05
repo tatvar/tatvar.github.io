@@ -21,21 +21,33 @@
      <!-- <p id="author" class="my-2 text-center text-sm">By: Цэнгүүнбилэг</p>  -->
       <div class="w-full">
         <form role="search" id="search-form" class="mb-3">
-          <label for="search-input" class="text-white">Регистрийн дугаар оруулна уу:</label>
-          <input 
-            type="text" 
-            name="pokemon" 
-            id="search-input" 
-            required
-            placeholder="Регистрийн дугаар" 
-            class="w-3/4 border-2 text-pink-200 bg-transparent rounded p-2 placeholder-violet-200 focus:outline-none focus:ring-2 focus:ring-violet-400" 
-          />
-          <button 
-            id="search-button" 
-            class="px-4 py-2 bg-pink-400 text-white rounded-md hover:bg-pink-600 transition-all ease-in"
-          >
-            Хайх
-          </button>
+          <label for="search-input" class="text-white block mb-2">Регистрийн дугаар оруулна уу:</label>
+          <div class="flex w-full gap-2">
+            <div class="relative flex-1">
+              <input 
+                type="text" 
+                name="pokemon" 
+                id="search-input" 
+                required
+                placeholder="Регистрийн дугаар" 
+                class="w-full border-2 text-pink-200 bg-transparent rounded p-2 pr-20 placeholder-violet-200 focus:outline-none focus:ring-2 focus:ring-violet-400" 
+              />
+              <button 
+                type="button"
+                id="clear-button" 
+                class="absolute right-2 top-1/2 transform -translate-y-1/2 text-xs px-2 py-1 bg-red-500 text-white rounded hover:bg-red-700 transition-all hidden"
+                onclick="clearInput()"
+              >
+                Арилгах
+              </button>
+            </div>
+            <button 
+              id="search-button" 
+              class="px-6 py-2 bg-pink-400 text-white rounded-md hover:bg-pink-600 transition-all ease-in whitespace-nowrap"
+            >
+              Хайх
+            </button>
+          </div>
         </form>
         <div class="output">
           <div class="top-container mt-4" id="top-container">
