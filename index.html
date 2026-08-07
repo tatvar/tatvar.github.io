@@ -582,6 +582,295 @@
 </div>
 
 <script>
+(function () {
+  'use strict';
+
+  let queue = [];
+  let index = 0;
+
+  const pasteScreen = document.getElementById('paste-screen');
+  const dialer = document.getElementById('dialer');
+  const sourceInput = document.getElementById('source-input');
+  const errorMsg = document.getElementById('error-msg');
+
+  const curName = document.getElementById('cur-name');
+  const curNumber = document.getElementById('cur-number');
+  const curNote = document.getElementById('cur-note');
+  const curStatus = document.getElementById('cur-status');
+  const nextUpBadge = document.getElementById('next-up-badge');
+  let nextUpTimer = null;
+  const lastUpdated = document.getElementById('last-updated');
+  const strip = document.getElementById('strip-track');
+  const queuePos = document.getElementById('queue-pos');
+  const progressFill = document.getElementById('progress-fill');
+  const dialCard = document.getElementById('dial-card');
+  const activeView = document.getElementById('active-view');
+  const doneView = document.getElementById('done-view');
+  const dailyCountEl = document.getElementById('daily-count');
+  const lastDialedPanel = document.getElementById('last-dialed');
+  const ldPhone = document.getElementById('ld-phone');
+  const ldName = document.getElementById('ld-name');
+  const ldStatus = document.getElementById('ld-status');
+  const ldLabel = document.getElementById('ld-label');
+  let ldLabelTimer = null;
+  const toast = document.getElementById('toast');
+  const toastText = document.getElementById('toast-text');
+  let toastTimer = null;
+
+  function showToast(phone) {
+    toastText.textContent = `${phone}-руу залгаж байна...`;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => {
+      toast.classList.remove('show');
+    }, 5500);
+  }
+
+  const themeToggle = document.getElementById('theme-toggle');
+  function applyTheme(mode) {
+    if (mode === 'light') {
+      document.body.classList.add('light-mode');
+      themeToggle.textContent = '🌙';
+    } else {
+      document.body.classList.remove('light-mode');
+      themeToggle.textContent = '☀';
+    }
+    localStorage.setItem('dialer-theme', mode);
+  }
+  themeToggle.addEventListener('click', () => {
+    applyTheme(document.body.classList.contains('light-mode') ? 'dark' : 'light');
+  });
+  applyTheme(localStorage.getItem('dialer-theme') || 'dark');
+
+  const autocopyToggle = document.getElementById('autocopy-toggle');
+  let autoCopyEnabled = localStorage.getItem('dialer-autocopy') !== '0'; // ON by default
+  function updateAutocopyUI() {
+    autocopyToggle.classList.toggle('off', !autoCopyEnabled);
+  }
+  autocopyToggle.addEventListener('click', () => {
+    autoCopyEnabled = !autoCopyEnabled;
+    localStorage.setItem('dialer-autocopy', autoCopyEnabled ? '1' : '0');
+    updateAutocopyUI();
+  });
+  updateAutocopyUI();
+
+  function copyToClipboard(text) {
+    if (!autoCopyEnabled) return;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).catch(() => {
+        console.warn('Clipboard copy failed — this page may need to run over http(s):// or localhost rather than file://.');
+      });
+    }
+  }
+
+  function todayKey() {
+    return 'dialer-count-' + new Date().toISOString().slice(0, 10);
+  }
+  function bumpDaily() {
+    const n = parseInt(localStorage.getItem(todayKey()) || '0', 10) + 1;
+    localStorage.setItem(todayKey(), String(n));
+    return n;
+  }
+  function getDaily() {
+    return parseInt(localStorage.getItem(todayKey()) || '0', 10);
+  }
+
+  const KNOWN_STATUS_CLASSES = ['mute', 'success', 'info', 'warning', 'danger', 'purple'];
+
+  function extractFromSource(html) {
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    const rows = doc.querySelectorAll('#result_list tbody tr');
+    const list = [];
+    rows.forEach((row) => {
+      const phoneCell = row.querySelector('.field-phone');
+      const nameCell = row.querySelector('.field-name');
+      const noteCell = row.querySelector('.field-note');
+      const statusCell = row.querySelector('.field-status_with_class');
+      let statusText = '';
+      let statusClass = 'mute';
+      if (statusCell) {
+        statusText = statusCell.textContent.trim();
+        const span = statusCell.querySelector('span');
+        if (span) {
+          const found = Array.from(span.classList).find((c) => KNOWN_STATUS_CLASSES.includes(c));
+          if (found) statusClass = found;
+        }
+      }
+      if (phoneCell) {
+        list.push({
+          phone: phoneCell.textContent.trim(),
+          name: nameCell ? nameCell.textContent.trim() : '',
+          note: noteCell ? noteCell.textContent.trim() : '',
+          status: statusText,
+          statusClass: statusClass,
+        });
+      }
+    });
+    return list;
+  }
+
+  const SLOT_WIDTH = 96; // px — keep in sync with .strip-item width in CSS
+  let stripBuilt = false;
+
+  function buildStrip() {
+    strip.innerHTML = '';
+    queue.forEach((item) => {
+      const div = document.createElement('div');
+      div.className = 'strip-item';
+      div.textContent = item.phone;
+      strip.appendChild(div);
+    });
+    stripBuilt = true;
+  }
+
+  function renderStrip() {
+    if (!stripBuilt) buildStrip();
+    const children = strip.children;
+    for (let i = 0; i < children.length; i++) {
+      const el = children[i];
+      const dist = Math.abs(i - index);
+      el.className = 'strip-item';
+      if (i < index) el.classList.add('done');
+      if (dist === 0) el.classList.add('dist-0');
+      else if (dist === 1) el.classList.add('dist-1');
+      else if (dist === 2) el.classList.add('dist-2');
+    }
+    strip.style.transform = `translateX(${(2 - index) * SLOT_WIDTH}px)`;
+  }
+
+  function renderCurrent() {
+    const cur = queue[index];
+    queuePos.textContent = `${Math.min(index + 1, queue.length)} / ${queue.length}`;
+    progressFill.style.width = queue.length ? `${(index / queue.length) * 100}%` : '0%';
+    dailyCountEl.textContent = getDaily();
+    renderStrip();
+
+    if (cur) {
+      activeView.style.display = 'block';
+      doneView.style.display = 'none';
+      curName.textContent = cur.name || '—';
+      curNumber.textContent = cur.phone;
+      curNote.textContent = cur.note || '—';
+      curStatus.textContent = cur.status || '—';
+      curStatus.className = 'status-badge ' + (cur.statusClass || 'mute');
+    } else {
+      activeView.style.display = 'none';
+      doneView.style.display = 'block';
+    }
+  }
+
+  function updateLastDialed(item) {
+    const wasStillLive = !!ldLabelTimer;
+
+    lastDialedPanel.classList.remove('empty');
+    ldPhone.textContent = item.phone;
+    ldPhone.classList.remove('pulse');
+    void ldPhone.offsetWidth; // restart animation on consecutive dials
+    ldPhone.classList.add('pulse');
+    let nameNote = item.name || '';
+    if (item.note) nameNote += (nameNote ? ' — ' : '') + item.note;
+    ldName.textContent = nameNote;
+    ldStatus.textContent = item.status || '—';
+    ldStatus.className = 'status-badge ' + (item.statusClass || 'mute');
+
+    ldLabel.textContent = 'Одоо залгаж байна';
+    ldLabel.classList.add('active');
+    clearTimeout(ldLabelTimer);
+    ldLabelTimer = setTimeout(() => {
+      ldLabel.textContent = 'Сүүлд дуудсан';
+      ldLabel.classList.remove('active');
+    }, 5500);
+
+    if (wasStillLive) {
+      lastDialedPanel.classList.remove('refresh-pulse');
+      void lastDialedPanel.offsetWidth; // restart animation if triggered again quickly
+      lastDialedPanel.classList.add('refresh-pulse');
+    }
+  }
+
+  function fireCall() {
+    const cur = queue[index];
+    if (!cur) return;
+    const a = document.createElement('a');
+    a.href = 'sip:' + cur.phone;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+
+    showToast(cur.phone);
+    copyToClipboard(cur.phone);
+    updateLastDialed(cur);
+
+    dialCard.classList.add('fired');
+    setTimeout(() => dialCard.classList.remove('fired'), 400);
+
+    bumpDaily();
+    index++;
+    renderCurrent();
+
+    if (queue[index]) {
+      nextUpBadge.classList.add('show');
+      clearTimeout(nextUpTimer);
+      nextUpTimer = setTimeout(() => nextUpBadge.classList.remove('show'), 3000);
+    }
+  }
+
+  function skip() {
+    if (!queue[index]) return;
+    index++;
+    renderCurrent();
+  }
+
+  function formatTimestamp(d) {
+    const pad = (n) => String(n).padStart(2, '0');
+    return `${pad(d.getMonth() + 1)}/${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  }
+
+  document.getElementById('parse-btn').addEventListener('click', () => {
+    const html = sourceInput.value;
+    const list = extractFromSource(html);
+    if (!list.length) {
+      errorMsg.style.display = 'block';
+      return;
+    }
+    errorMsg.style.display = 'none';
+    queue = list;
+    index = 0;
+    stripBuilt = false;
+    pasteScreen.style.display = 'none';
+    dialer.style.display = 'block';
+    lastUpdated.textContent = 'Сүүлийн хувилбар: ' + formatTimestamp(new Date());
+    renderCurrent();
+  });
+
+  document.getElementById('call-btn').addEventListener('click', fireCall);
+  document.getElementById('skip-btn').addEventListener('click', skip);
+  document.getElementById('restart-btn').addEventListener('click', () => {
+    index = 0;
+    lastDialedPanel.classList.add('empty');
+    lastDialedPanel.classList.remove('refresh-pulse');
+    clearTimeout(ldLabelTimer);
+    ldLabel.textContent = 'Сүүлд дуудсан';
+    ldLabel.classList.remove('active');
+    nextUpBadge.classList.remove('show');
+    renderCurrent();
+  });
+  document.getElementById('new-list-btn').addEventListener('click', () => {
+    dialer.style.display = 'none';
+    pasteScreen.style.display = 'block';
+    sourceInput.value = '';
+    sourceInput.focus();
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (dialer.style.display !== 'block') return;
+    if (document.activeElement && document.activeElement.tagName === 'TEXTAREA') return;
+    if (e.code === 'Space') {
+      e.preventDefault();
+      fireCall();
+    }
+  });
+})();
 </script>
 
 </body>
