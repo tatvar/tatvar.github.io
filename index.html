@@ -514,13 +514,13 @@
       HUB-ийн шүүсэн жагсаалт дээрээ очоод хуудасны эх кодыг харна уу
       (<kbd>Ctrl</kbd>+<kbd>U</kbd> → <kbd>Ctrl</kbd>+<kbd>A</kbd> → <kbd>Ctrl</kbd>+<kbd>C</kbd>),
       дараа нь энд буулгана уу. Энэ хуудас HUB-тэй холбогдоогүй тул автоматаар уншиж чадахгүй —
-      учир нь браузер өөр домэйн хоорондын харилцан уншилтыг зөвшөөрдөггүй.
+      учир нь browser өөр домэйн хоорондын харилцан уншилтыг зөвшөөрдөггүй. Залгаж буй дугаарыг автоматаар хуулах бол Auto-copy товчийг дараарай.
     </p>
     <textarea id="source-input" placeholder="Энд буулгана уу (Ctrl+V)..."></textarea>
     <div class="row">
       <button class="primary" id="parse-btn">Жагсаалт гаргах</button>
     </div>
-    <div class="error" id="error-msg">Дугаар олдсонгүй. Хуулсан агуулгаа шалгана уу.</div>
+    <div class="error" id="error-msg">Дугаар олдсонгүй. Хуулсан кодоо шалгана уу.</div>
   </div>
 
   <!-- DIALER SCREEN -->
@@ -544,7 +544,7 @@
       </div>
       <div class="done-state" id="done-view" style="display:none;">
         <div class="big">Энэ жагсаалт дууслаа</div>
-        <div class="small">Дараагийн хуудсыг буулгахын тулд "Шинэ хуудас буулгах" товч дээр дарна уу.</div>
+        <div class="small">Дараагийн хуудсыг буулгахын тулд "Шинэ жагсаалт гаргах" товч дээр дарна уу.</div>
       </div>
 
       <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
@@ -574,8 +574,8 @@
     </div>
 
     <div class="footer-actions">
-      <button class="ghost" id="restart-btn">↺ Эхнээс</button>
-      <button class="ghost" id="new-list-btn">+ Шинэ хуудас буулгах</button>
+      <button class="ghost" id="restart-btn">↺ Эхнээс нь</button>
+      <button class="ghost" id="new-list-btn">+ Шинэ жагсаалт гаргах</button>
     </div>
   </div>
 
@@ -839,7 +839,7 @@
     stripBuilt = false;
     pasteScreen.style.display = 'none';
     dialer.style.display = 'block';
-    lastUpdated.textContent = 'Сүүлийн хувилбар: ' + formatTimestamp(new Date());
+    lastUpdated.textContent = 'Сүүлд шинэчилсэн: ' + formatTimestamp(new Date());
     renderCurrent();
   });
 
